@@ -15,19 +15,15 @@ public class Board extends JPanel implements ActionListener {
 
     private final int B_WIDTH = 900;
     private final int B_HEIGHT = 900;
-    private final int ALL_DOTS = 900;
     private final int DOT_SIZE = 10;
     private final int DELAY = 1000;
     private final int MOVE_AMOUNT = 10;
 
-    private final int x[] = new int[ALL_DOTS];
-    private final int y[] = new int[ALL_DOTS];
-
     private int numberOfHorizontalMovements = 0;
     private int numberOfVerticalMovements = 0;
 
-    private int dots;
     private final Random random = new Random();
+    private Dot[] dots = new Dot[0];
 
     private boolean inGame = true;
 
@@ -51,13 +47,6 @@ public class Board extends JPanel implements ActionListener {
     }
 
     private void initGame() {
-        dots = 3;
-
-        for (int z = 0; z < dots; z++) {
-            x[z] = 50 - z * 10;
-            y[z] = 50;
-        }
-
         timer = new Timer(DELAY, this);
         timer.start();
     }
@@ -78,13 +67,17 @@ public class Board extends JPanel implements ActionListener {
     private void doDrawing(Graphics g) {
 
         if (inGame) {
-            for (int z = 0; z < dots; z++) {
+            if (dots.length == 0) {
+                drawOutlinedCircle(g);
+            }
+
+            for (int z = 0; z < dots.length; z++) {
                 if (z == 0) {
                     drawOutlinedCircle(g);
                 } else {
 
-                    // g.fillOval(outlinedCircleX + z * 10, outlinedCircleY + z * 10, DOT_SIZE,
-                    // DOT_SIZE);
+                    g.fillOval(outlinedCircleX + z * 10, outlinedCircleY + z * 10, DOT_SIZE,
+                            DOT_SIZE);
                 }
             }
 
@@ -118,7 +111,8 @@ public class Board extends JPanel implements ActionListener {
                 outlinedCircleX = generateRandomPosition();
                 outlinedCircleY = generateRandomPosition();
             } else {
-                getGraphics().fillOval(x[outlinedCircleX + 10], y[outlinedCircleY + 10], DOT_SIZE, DOT_SIZE);
+                // getGraphics().fillOval(x[outlinedCircleX + 10], y[outlinedCircleY + 10],
+                // DOT_SIZE, DOT_SIZE);
             }
 
             repaint();
