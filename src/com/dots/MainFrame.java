@@ -6,9 +6,9 @@ import java.awt.Rectangle;
 
 import javax.swing.JFrame;
 
-public class main extends JFrame {
+public class MainFrame extends JFrame {
 
-    public main() {
+    public MainFrame() {
         initUI();
     }
 
@@ -29,7 +29,7 @@ public class main extends JFrame {
     public static void main(String[] args) {
 
         EventQueue.invokeLater(() -> {
-            JFrame ex = new main();
+            JFrame ex = new MainFrame();
             ex.setVisible(true);
         });
     }
