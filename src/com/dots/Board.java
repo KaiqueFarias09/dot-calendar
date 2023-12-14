@@ -7,7 +7,6 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -94,38 +93,44 @@ public class Board extends JPanel implements ActionListener {
                 mainCircleXCoordinate = generateRandomPosition();
                 mainCircleYCoordinate = generateRandomPosition();
             } else {
-                int[][] coordinates = getNeighborCoordinates(mainCircleXCoordinate, mainCircleYCoordinate);
+                dots.add(new Dot(mainCircleXCoordinate, mainCircleYCoordinate));
 
+                List<int[]> coordinates = getNeighborCoordinates(mainCircleXCoordinate, mainCircleYCoordinate);
                 List<int[]> validCoordinates = filterValidCoordinates(coordinates, dots);
 
                 int randomIndex = random.nextInt(validCoordinates.size());
                 int[] chosenCoordinate = validCoordinates.get(randomIndex);
-
-                dots.add(new Dot(mainCircleXCoordinate, mainCircleYCoordinate));
-
                 mainCircleXCoordinate = chosenCoordinate[0];
                 mainCircleYCoordinate = chosenCoordinate[1];
+
+                createNewDotInRandomCoordination();
             }
 
             repaint();
         }
     }
 
-    private List<int[]> filterValidCoordinates(int[][] coordinates, List<Dot> dots) {
-        return Arrays.stream(coordinates)
+    private void createNewDotInRandomCoordination() {
+        List<int[]> newCoordinates = getNeighborCoordinates(mainCircleXCoordinate, mainCircleYCoordinate);
+        int[] randomCoordinate = newCoordinates.get(random.nextInt(newCoordinates.size()));
+        dots.add(new Dot(randomCoordinate[0], randomCoordinate[1]));
+    }
+
+    private List<int[]> filterValidCoordinates(List<int[]> coordinates, List<Dot> dots) {
+        return coordinates.stream()
                 .filter(coordinate -> dots.stream()
                         .noneMatch(dot -> dot.getX() == coordinate[0] && dot.getY() == coordinate[1]))
                 .collect(Collectors.toList());
     }
 
-    private int[][] getNeighborCoordinates(int x, int y) {
-        int[][] coordinates = new int[8][2];
+    private List<int[]> getNeighborCoordinates(int x, int y) {
+        List<int[]> coordinates = new ArrayList<>();
 
         int[] dx = { 1, -1, 0, 0, 1, -1, 1, -1 };
         int[] dy = { 0, 0, 1, -1, 1, 1, -1, -1 };
 
         for (int i = 0; i < 8; i++) {
-            coordinates[i] = new int[] { x + MOVE_AMOUNT * dx[i], y + MOVE_AMOUNT * dy[i] };
+            coordinates.add(new int[] { x + MOVE_AMOUNT * dx[i], y + MOVE_AMOUNT * dy[i] });
         }
 
         return coordinates;

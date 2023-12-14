@@ -24,7 +24,6 @@ public class main extends JFrame {
         setExtendedState(MAXIMIZED_BOTH);
         setSize(r.width, r.height);
         setVisible(true);
-        setUndecorated(true);
     }
 
     public static void main(String[] args) {
