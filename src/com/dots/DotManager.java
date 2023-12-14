@@ -3,12 +3,11 @@ package com.dots;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class DotHelper {
-    private static final int MOVE_AMOUNT = 20;
+public class DotManager {
+    private static final int MOVE_AMOUNT = 10;
 
-    private DotHelper() {
+    private DotManager() {
     }
-
 
     public static Dot getNeighborWithMostNeighbors(Dot mainDot, List<Dot> dots) {
         List<Dot> neighbors = getNeighbors(mainDot, dots);
@@ -31,7 +30,6 @@ public class DotHelper {
                 .filter(dot -> dot != targetDot && isNeighbor(dot, targetDot))
                 .collect(Collectors.toList());
     }
-
 
     public static Dot getClosestDot(Dot mainDot, List<Dot> dots) {
         double minDistance = Double.MAX_VALUE;
