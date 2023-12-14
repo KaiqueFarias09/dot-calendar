@@ -18,22 +18,16 @@ public class Board extends JPanel implements ActionListener {
 
     private final int BOARD_WIDTH = 900;
     private final int BOARD_HEIGHT = 900;
-    private final int DOT_SIZE = 10;
-    private final int DELAY = 1000;
-    private final int MOVE_AMOUNT = 10;
+    private final int DOT_SIZE = 20;
 
     private final Random random = new Random();
-    private List<Dot> dots = new ArrayList<>();
+    private final List<Dot> dots = new ArrayList<>();
 
-    private boolean shouldGenerateDots = true;
+    private final boolean shouldGenerateDots = true;
     private int day = 0;
-    private int halfOfMonth = 16;
-    private int monthNumber = 1;
 
     private int mainCircleXCoordinate;
     private int mainCircleYCoordinate;
-
-    private Timer timer;
 
     public Board() {
         initBoard();
@@ -50,7 +44,8 @@ public class Board extends JPanel implements ActionListener {
     }
 
     private void initGame() {
-        timer = new Timer(DELAY, this);
+        int DELAY = 2000;
+        Timer timer = new Timer(DELAY, this);
         timer.start();
     }
 
@@ -72,10 +67,9 @@ public class Board extends JPanel implements ActionListener {
         if (shouldGenerateDots) {
             drawMainCircle(g);
 
-            for (int z = 0; z < dots.size(); z++) {
-                final Dot dot = dots.get(z);
-                final int xCoordinate = dot.getX();
-                final int yCoordinate = dot.getY();
+            for (final Dot dot : dots) {
+                final int xCoordinate = dot.x();
+                final int yCoordinate = dot.y();
 
                 g.fillOval(xCoordinate, yCoordinate, DOT_SIZE, DOT_SIZE);
             }
@@ -93,6 +87,7 @@ public class Board extends JPanel implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (shouldGenerateDots) {
 
+            int halfOfMonth = 16;
             if (day != halfOfMonth) {
                 if (isCloseToTheBorder()) {
                     mainCircleXCoordinate = generateRandomPosition();
@@ -112,49 +107,32 @@ public class Board extends JPanel implements ActionListener {
                 }
                 day += 1;
             } else {
+                int monthNumber = 1;
+
                 if (dots.size() > monthNumber) {
-                    Dot dotWithLessNeighbors = findDotWithLeastNeighbors(dots);
-                    dots.remove(dotWithLessNeighbors);
+                    Dot dot = DotHelper.getNeighborWithMostNeighbors(new Dot(mainCircleXCoordinate, mainCircleYCoordinate), dots);
+                    if (dot != null) {
+                        dots.remove(dot);
+
+                        mainCircleXCoordinate = dot.x();
+                        mainCircleYCoordinate = dot.y();
+                    } else {
+                        Dot closestDot = DotHelper.getClosestDot(new Dot(mainCircleXCoordinate, mainCircleYCoordinate), dots);
+                        dots.remove(closestDot);
+
+                        mainCircleXCoordinate = closestDot.x();
+                        mainCircleYCoordinate = closestDot.y();
+                    }
                 }
 
+                if (dots.size() > monthNumber) {
+                    Dot dotWithLessNeighbors = DotHelper.findDotWithLeastNeighbors(dots);
+                    dots.remove(dotWithLessNeighbors);
+                }
             }
 
             repaint();
         }
-    }
-
-    private Dot findDotWithLeastNeighbors(List<Dot> dots) {
-        int minNeighborCount = Integer.MAX_VALUE;
-        Dot dotWithLeastNeighbors = null;
-
-        for (Dot dot : dots) {
-            int neighborCount = countNeighbors(dot, dots);
-            if (neighborCount < minNeighborCount) {
-                minNeighborCount = neighborCount;
-                dotWithLeastNeighbors = dot;
-            }
-        }
-
-        return dotWithLeastNeighbors;
-    }
-
-    private int countNeighbors(Dot targetDot, List<Dot> dots) {
-        int count = 0;
-
-        for (Dot dot : dots) {
-            if (dot != targetDot && isNeighbor(dot, targetDot)) {
-                count++;
-            }
-        }
-
-        return count;
-    }
-
-    private boolean isNeighbor(Dot dot1, Dot dot2) {
-        int dx = Math.abs(dot1.getX() - dot2.getX());
-        int dy = Math.abs(dot1.getY() - dot2.getY());
-
-        return (dx == MOVE_AMOUNT && dy == 0) || (dx == 0 && dy == MOVE_AMOUNT);
     }
 
     private void createNewDotInRandomCoordinate() {
@@ -166,18 +144,19 @@ public class Board extends JPanel implements ActionListener {
     private List<int[]> filterValidCoordinates(List<int[]> coordinates, List<Dot> dots) {
         return coordinates.stream()
                 .filter(coordinate -> dots.stream()
-                        .noneMatch(dot -> dot.getX() == coordinate[0] && dot.getY() == coordinate[1]))
+                        .noneMatch(dot -> dot.x() == coordinate[0] && dot.y() == coordinate[1]))
                 .collect(Collectors.toList());
     }
 
     private List<int[]> getNeighborCoordinates(int x, int y) {
         List<int[]> coordinates = new ArrayList<>();
 
-        int[] dx = { 1, -1, 0, 0, 1, -1, 1, -1 };
-        int[] dy = { 0, 0, 1, -1, 1, 1, -1, -1 };
+        int[] dx = {1, -1, 0, 0, 1, -1, 1, -1};
+        int[] dy = {0, 0, 1, -1, 1, 1, -1, -1};
 
         for (int i = 0; i < 8; i++) {
-            coordinates.add(new int[] { x + MOVE_AMOUNT * dx[i], y + MOVE_AMOUNT * dy[i] });
+            int MOVE_AMOUNT = 20;
+            coordinates.add(new int[]{x + MOVE_AMOUNT * dx[i], y + MOVE_AMOUNT * dy[i]});
         }
 
         return coordinates;
