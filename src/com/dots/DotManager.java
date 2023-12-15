@@ -1,12 +1,32 @@
 package com.dots;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class DotManager {
     private static final int MOVE_AMOUNT = 10;
 
     private DotManager() {
+    }
+
+    public static List<int[]> getNeighborCoordinates(int x, int y) {
+        List<int[]> coordinates = new ArrayList<>();
+
+        int[] dx = { 1, -1, 0, 0, 1, -1, 1, -1 };
+        int[] dy = { 0, 0, 1, -1, 1, 1, -1, -1 };
+
+        for (int i = 0; i < 8; i++) {
+            coordinates.add(new int[] { x + MOVE_AMOUNT * dx[i], y + MOVE_AMOUNT * dy[i] });
+        }
+
+        return coordinates;
+    }
+
+    public static List<int[]> filterValidCoordinates(List<int[]> coordinates, List<Dot> dots) {
+        return coordinates.stream()
+                .filter(coordinate -> dots.stream()
+                        .noneMatch(dot -> dot.x() == coordinate[0] && dot.y() == coordinate[1]))
+                .toList();
     }
 
     public static Dot getNeighborWithMostNeighbors(Dot mainDot, List<Dot> dots) {
@@ -28,7 +48,7 @@ public class DotManager {
     private static List<Dot> getNeighbors(Dot targetDot, List<Dot> dots) {
         return dots.stream()
                 .filter(dot -> dot != targetDot && isNeighbor(dot, targetDot))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public static Dot getClosestDot(Dot mainDot, List<Dot> dots) {
@@ -51,7 +71,7 @@ public class DotManager {
     private static double calculateDistance(Dot dot1, Dot dot2) {
         int dx = dot1.x() - dot2.x();
         int dy = dot1.y() - dot2.y();
-        return Math.sqrt(dx * dx + dy * dy);
+        return Math.sqrt((double)(dx * dx) + (dy * dy));
     }
 
     public static Dot findDotWithLeastNeighbors(List<Dot> dots) {
